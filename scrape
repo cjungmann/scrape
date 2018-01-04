@@ -1,0 +1,47 @@
+#!/usr/bin/env python2
+
+import sys     # for handling arguments (argv)
+import libxml2
+import libxslt
+
+def init_xslproc(f_use_ss, f_transform):
+    readopts = (libxml2.XML_PARSE_RECOVER)
+    if len(sys.argv)>1:
+        xslname = sys.argv[1]
+        xsldoc = libxml2.readFile(xslname, None, readopts)
+        if xsldoc:
+            style = libxslt.parseStylesheetDoc(xsldoc)
+            if style:
+                f_use_ss(style, f_transform)
+                style.freeStylesheet()
+            else:
+                # This may cause a double-free error if parseStylesheetDoc()
+                # closes it on failure.  
+                xsldoc.freeDoc()
+
+def get_xmldoc(xsl_ss, f_transform):
+    readopts = (libxml2.HTML_PARSE_RECOVER |
+                libxml2.HTML_PARSE_NODEFDTD |
+                libxml2.HTML_PARSE_NOERROR |
+                libxml2.HTML_PARSE_NOWARNING |
+                libxml2.HTML_PARSE_NONET)
+    if len(sys.argv)>2:
+        xmlname = sys.argv[2]
+        xmldoc = libxml2.htmlReadFile(xmlname, None, readopts)
+        if xmldoc:
+            f_transform(xsl_ss, xmldoc)
+            xmldoc.freeDoc()
+
+def transform(xsl_ss, xmldoc):
+    result = xsl_ss.applyStylesheet(xmldoc,None)
+    if result:
+        result.dump(sys.stdout)
+        result.freeDoc()
+
+def main():
+    init_xslproc(get_xmldoc, transform);
+    
+
+if __name__ == "__main__":
+    main()
+    
