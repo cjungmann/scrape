@@ -4,12 +4,36 @@ import sys     # for handling arguments (argv)
 import libxml2
 import libxslt
 
+g_dumpopts = (libxml2.XML_SAVE_FORMAT | libxml2.XML_SAVE_NO_XHTML)
+
+def xpathNSEval(doc, expr):
+    """ Called to do a namespace-aware xpath evaluation of an XSLT document. """
+    ctxt = doc.xpathNewContext()
+    ctxt.setContextNode(doc)
+    ctxt.xpathRegisterNs("xsl", "http://www.w3.org/1999/XSL/Transform")
+    res = ctxt.xpathEval(expr)
+    ctxt.xpathFreeContext()
+    return res
+
+def fix_dumpopts(xsldoc):
+    """called to do additional preparation for printing without the
+       the XML declaration if xsl:output/@omit-xml-declaration="yes"."""
+    global g_dumpopts
+    xpath = "xsl:stylesheet/xsl:output/@omit-xml-declaration"
+    try:
+        output_list = xpathNSEval(xsldoc, xpath)
+        if len(output_list)>0 and output_list[0].get_content()=="yes":
+            g_dumpopts += libxml2.XML_SAVE_NO_DECL
+    except libxml2.xpathError as e:
+        sys.stdout.write("xpathEval failed \"%s\"\n" % e)
+        
 def init_xslproc(f_use_ss, f_transform):
-    readopts = (libxml2.XML_PARSE_RECOVER)
     if len(sys.argv)>1:
         xslname = sys.argv[1]
-        xsldoc = libxml2.readFile(xslname, None, readopts)
+        # No parse relaxing: an XSL stylesheet should be valid XML.
+        xsldoc = libxml2.readFile(xslname,None,0)
         if xsldoc:
+            fix_dumpopts(xsldoc)
             style = libxslt.parseStylesheetDoc(xsldoc)
             if style:
                 f_use_ss(style, f_transform)
@@ -33,9 +57,15 @@ def get_xmldoc(xsl_ss, f_transform):
             xmldoc.freeDoc()
 
 def transform(xsl_ss, xmldoc):
+    global g_dumpopts
     result = xsl_ss.applyStylesheet(xmldoc,None)
     if result:
-        result.dump(sys.stdout)
+        try:
+            root = result.getRootElement()
+            root.saveTo(sys.stdout, None, g_dumpopts)
+        except libxml2.treeError as e:
+            sys.stderr.write("\"%s\" failure for file \"%s\", \"%s\"\n"
+                             % (e,sys.argv[1],sys.argv[2]))
         result.freeDoc()
 
 def main():
