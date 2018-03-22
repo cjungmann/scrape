@@ -100,5 +100,5 @@ I left that out.  The stylesheet is custom-written for the source, and
 usually requires some trial-and-error to make a good stylesheet, so it
 is better to download the HTML page.
 
-
-
+My [name generating project](https://github.com/cjungmann/namegen) includes
+a [script file](https://github.com/cjungmann/namegen/builddoc) that can serve as a more complete example of how to use this utility to accomplish a scraping task.
