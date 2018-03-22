@@ -101,4 +101,4 @@ usually requires some trial-and-error to make a good stylesheet, so it
 is better to download the HTML page.
 
 My [name generating project](https://github.com/cjungmann/namegen) includes
-a [script file](https://github.com/cjungmann/namegen/master/builddoc) that can serve as a more complete example of how to use this utility to accomplish a scraping task.
+a [script file](https://github.com/cjungmann/namegen/blob/master/builddoc) that can serve as a more complete example of how to use this utility to accomplish a scraping task.
