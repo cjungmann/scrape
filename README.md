@@ -47,6 +47,14 @@ the libraries from source.
 sudo apt-get install python-libxml2 python-libxslt1
 ~~~
 
+### Why Not Directly Read the HTML File From the Internet?
+
+The basic idea is to use an XSL stylesheet to extract the desired content
+from the web page.  Generally, the downloaded HTML file must be studied
+to see how the data is configured in order to design the stylesheet.  Because
+of this necessary step, the program reads an HTML file rather than directly
+downloading it from the internet.  
+
 #### Documentation for libxml2.py 
 
 There is extensive documentation for the C interfaces to `libxml2`
