@@ -4,7 +4,8 @@ import sys     # for handling arguments (argv)
 import libxml2
 import libxslt
 
-g_dumpopts = (libxml2.XML_SAVE_FORMAT | libxml2.XML_SAVE_NO_XHTML)
+# g_dumpopts = (libxml2.XML_SAVE_FORMAT + libxml2.XML_SAVE_NO_XHTML)
+g_dumpopts = (libxml2.XML_SAVE_FORMAT + libxml2.XML_SAVE_XHTML + libxml2.XML_SAVE_AS_XML)
 
 def xpathNSEval(doc, expr):
     """ Called to do a namespace-aware xpath evaluation of an XSLT document. """
