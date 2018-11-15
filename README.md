@@ -47,7 +47,7 @@ must be saved, simple add *> result.html* the call the **scrape**.
 1. The standard usage is to provide both an XSL stylesheet and an
    HTML file.
    ~~~sh
-   scrape [xsl filename] <html filename>
+   scrape sample.xsl sample.html
    ~~~
 
 1. Use default *sanitize.xsl* stylesheet to create a valid XHTML
@@ -55,7 +55,7 @@ must be saved, simple add *> result.html* the call the **scrape**.
    or an XSL debugger like [Oxygen](www.oxygenxml.com).
 
    ~~~sh
-   scrape <html filename> > "test.html"
+   scrape messysample.html > "cleansample.html"
    ~~~
 
 1. In either of the first two forms, the HTML filename can be
