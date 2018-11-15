@@ -71,7 +71,12 @@ def get_xmldoc(xsl_ss, f_transform):
                 libxml2.HTML_PARSE_NOERROR |
                 libxml2.HTML_PARSE_NOWARNING |
                 libxml2.HTML_PARSE_NONET)
-    xmldoc = libxml2.htmlReadFile(g_html_name, None, readopts)
+
+    if g_html_name == '-':
+        xmldoc = libxml2.htmlCtxtReadFd(0, None, None, readopts)
+    else:
+        xmldoc = libxml2.htmlReadFile(g_html_name, None, readopts)
+
     if xmldoc:
         f_transform(xsl_ss, xmldoc)
         xmldoc.freeDoc()
