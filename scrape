@@ -1,11 +1,32 @@
 #!/usr/bin/env python2
 
 import sys     # for handling arguments (argv)
+import os      # to help resolve location of sanitize.xsl stylesheet
 import libxml2
 import libxslt
 
+__location__ = os.path.dirname(os.path.realpath(__file__))
+g_sanitize = os.path.join(__location__,"sanitize.xsl")
+
+g_stylesheet_name = None
+g_html_name = None
+
 # g_dumpopts = (libxml2.XML_SAVE_FORMAT + libxml2.XML_SAVE_NO_XHTML)
 g_dumpopts = (libxml2.XML_SAVE_FORMAT + libxml2.XML_SAVE_XHTML + libxml2.XML_SAVE_AS_XML)
+
+def show_usage():
+    print "Usage:"
+    print "scrape [xsl stylesheet] <html file>"
+    print "examples:"
+    print
+    print "Extract data from people.html using scrape_people.xsl stylesheet:"
+    print "scrape scrape_people.xsl people.html"
+    print
+    print "Pass only the HTML filename (omit the XSL stylesheet) to use the"
+    print "supplied sanitize.xsl stylesheet to convert a message HTML file"
+    print "into a valid XHTML document:"
+    print "scrape people.html"
+
 
 def xpathNSEval(doc, expr):
     """ Called to do a namespace-aware xpath evaluation of an XSLT document. """
@@ -29,33 +50,31 @@ def fix_dumpopts(xsldoc):
         sys.stdout.write("xpathEval failed \"%s\"\n" % e)
         
 def init_xslproc(f_use_ss, f_transform):
-    if len(sys.argv)>1:
-        xslname = sys.argv[1]
-        # No parse relaxing: an XSL stylesheet should be valid XML.
-        xsldoc = libxml2.readFile(xslname,None,0)
-        if xsldoc:
-            fix_dumpopts(xsldoc)
-            style = libxslt.parseStylesheetDoc(xsldoc)
-            if style:
-                f_use_ss(style, f_transform)
-                style.freeStylesheet()
-            else:
-                # This may cause a double-free error if parseStylesheetDoc()
-                # closes it on failure.  
-                xsldoc.freeDoc()
+    global g_stylesheet_name
+    # No parse relaxing: an XSL stylesheet should be valid XML.
+    xsldoc = libxml2.readFile(g_stylesheet_name,None,0)
+    if xsldoc:
+        fix_dumpopts(xsldoc)
+        style = libxslt.parseStylesheetDoc(xsldoc)
+        if style:
+            f_use_ss(style, f_transform)
+            style.freeStylesheet()
+        else:
+            # This may cause a double-free error if parseStylesheetDoc()
+            # closes it on failure.  
+            xsldoc.freeDoc()
 
 def get_xmldoc(xsl_ss, f_transform):
+    global g_html_name
     readopts = (libxml2.HTML_PARSE_RECOVER |
                 libxml2.HTML_PARSE_NODEFDTD |
                 libxml2.HTML_PARSE_NOERROR |
                 libxml2.HTML_PARSE_NOWARNING |
                 libxml2.HTML_PARSE_NONET)
-    if len(sys.argv)>2:
-        xmlname = sys.argv[2]
-        xmldoc = libxml2.htmlReadFile(xmlname, None, readopts)
-        if xmldoc:
-            f_transform(xsl_ss, xmldoc)
-            xmldoc.freeDoc()
+    xmldoc = libxml2.htmlReadFile(g_html_name, None, readopts)
+    if xmldoc:
+        f_transform(xsl_ss, xmldoc)
+        xmldoc.freeDoc()
 
 def transform(xsl_ss, xmldoc):
     global g_dumpopts
@@ -70,7 +89,21 @@ def transform(xsl_ss, xmldoc):
         result.freeDoc()
 
 def main():
-    init_xslproc(get_xmldoc, transform);
+    global g_stylesheet_name, g_html_name, g_sanitize
+
+    slen = len(sys.argv)
+
+    if slen == 1:
+        show_usage()
+    else:
+        if slen == 2:
+            g_stylesheet_name = g_sanitize
+            g_html_name = sys.argv[1]
+        elif slen == 3:
+            g_stylesheet_name = sys.argv[1]
+            g_html_name = sys.argv[2]
+
+        init_xslproc(get_xmldoc, transform);
     
 
 if __name__ == "__main__":
