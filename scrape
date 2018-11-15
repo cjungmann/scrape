@@ -26,6 +26,13 @@ def show_usage():
     print "supplied sanitize.xsl stylesheet to convert a message HTML file"
     print "into a valid XHTML document:"
     print "scrape people.html"
+    print
+    print "Load the HTML page from STDIN:"
+    print "wget -O- www.dustyfeet.com | scrape -"
+    print 
+    print "Remember that you can save the output to a file by using the '>'"
+    print "operator:"
+    print "scrape -O- www.dustyfeet.com | scrape - > dustyfeet.html"
 
 
 def xpathNSEval(doc, expr):
