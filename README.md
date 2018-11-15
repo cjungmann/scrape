@@ -52,7 +52,7 @@ must be saved, simple add *> result.html* the call the **scrape**.
 
 1. Use default *sanitize.xsl* stylesheet to create a valid XHTML
    document from the HTML.  The valid XHTML can be used with *xsltproc*
-   or an XSL debugger like [Oxygen](www.oxygenxml.com).
+   or an XSL debugger like [Oxygen](http://www.oxygenxml.com).
 
    ~~~sh
    scrape messysample.html > cleansample.html
