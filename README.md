@@ -55,14 +55,14 @@ must be saved, simple add *> result.html* the call the **scrape**.
    or an XSL debugger like [Oxygen](www.oxygenxml.com).
 
    ~~~sh
-   scrape messysample.html > "cleansample.html"
+   scrape messysample.html > cleansample.html
    ~~~
 
 1. In either of the first two forms, the HTML filename can be
    replace with *-* to read the HTML file from **stdin**.
 
    ~~~sh
-   wget -O- www.dustyfeet.com | scrape - > "dustyfeet.html"
+   wget -O- www.dustyfeet.com | scrape - > dustyfeet.html
    ~~~
 
 There is an example section at the bottom of this document that
