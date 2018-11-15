@@ -9,15 +9,73 @@ files, it is often unable to parse the HTML file, even with `--html` flag
 set.  This script uses the `libxml2` and `libxslt` libraries to offer a
 much more forgiving HTML parser.
 
-## Usage
+## Installation
+
+Download from GitHub:
 
 ~~~sh
-./scrape <xsl filename> <xml filename>
+git clone https://github.com/cjungmann/scrape.git
 ~~~
+
+There is an *install* script that copies the python script and the
+*sanitize.xsl* stylesheet to /usr/local/lib, then makes a link in the
+/usr/local/bin directory to the *scrape* program.
+
+To install:
+~~~sh
+sudo ./install
+~~~
+
+To uninstall:
+~~~sh
+sudo ./install --uninstall
+~~~
+
+For instructions (largely the same as these):
+~~~sh
+./install --help
+~~~
+(Actually, any argument after *./install* besides *--uninstall* will
+print a usage message.)
+
+## Usage
+
+There are several ways this utility can be used.  In all cases, the
+result is written to **stdout**.  In the likely event that the results
+must be saved, simple add *> result.html* the call the **scrape**.
+
+1. The standard usage is to provide both an XSL stylesheet and an
+   HTML file.
+   ~~~sh
+   scrape [xsl filename] <html filename>
+   ~~~
+
+1. Use default *sanitize.xsl* stylesheet to create a valid XHTML
+   document from the HTML.  The valid XHTML can be used with *xsltproc*
+   or an XSL debugger like [Oxygen](www.oxygenxml.com).
+
+   ~~~sh
+   scrape <html filename> > "test.html"
+   ~~~
+
+1. In either of the first two forms, the HTML filename can be
+   replace with *-* to read the HTML file from **stdin**.
+
+   ~~~sh
+   wget -O- www.dustyfeet.com | scrape - > "dustyfeet.html"
+   ~~~
 
 There is an example section at the bottom of this document that
 explains the sample files `avssnames.htm` and `avss.xsl` and how
 they are created.
+
+### Usage Suggestion
+
+Creating a stylesheet to scrape data from a website usually requires
+several iterations of the stylesheet to get the right data.  I
+recommend using the third form from above to create a proper XHTML
+file from the web page.  Having a sanitized XHTML file allows the
+use of *xsltproc* to help debug the stylesheet as it is being developed.
 
 ## Requirements
 
@@ -46,14 +104,6 @@ the libraries from source.
 ~~~sh
 sudo apt-get install python-libxml2 python-libxslt1
 ~~~
-
-### Why Not Directly Read the HTML File From the Internet?
-
-The basic idea is to use an XSL stylesheet to extract the desired content
-from the web page.  Generally, the downloaded HTML file must be studied
-to see how the data is configured in order to design the stylesheet.  Because
-of this necessary step, the program reads an HTML file rather than directly
-downloading it from the internet.  
 
 #### Documentation for libxml2.py 
 
