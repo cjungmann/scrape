@@ -1,0 +1,62 @@
+#!/bin/bash
+
+_check_for_sudo()
+{
+    if [ $USER != "root" ]; then
+        echo "Installation requires root privileges.  Use sudo."
+        return 1
+    fi
+    return 0
+}
+
+_install()
+{
+   local -i result
+   install -D --mode=755 scrape        /usr/local/lib/scrape/scrape
+   result=$?
+   if [ $result -eq 0 ]; then
+       install -D --mode=644 sanitize.xsl  /usr/local/lib/scrape/sanitize.xsl
+       cp -sf /usr/local/lib/scrape/scrape /usr/local/bin/scrape
+       echo "Successfully installed."
+   else
+       echo "Failed to copy files, result=$result"
+   fi
+}
+
+_uninstall()
+{
+    local -i result
+    rm -f /usr/local/bin/scrape
+    result=$?
+    if [ $result -eq 0 ]; then
+        rm -fr /usr/local/lib/scrape
+        echo "Successfully un-installed."
+    else
+        echo "Failed to uninstall, result=$result"
+    fi
+}
+
+_show_usage()
+{
+   echo "To install the python executable, scrape, and the companion"
+   echo "stylesheet, sanitize.xsl, simply run this program."
+   echo
+   echo "To uninstall, type:"
+   echo "./install --uninstall"
+   echo
+   echo "To see this help page, type:"
+   echo "./install --help"
+}
+
+if [ $# -lt 1 ]; then
+    if _check_for_sudo; then
+        _install
+    fi
+elif [ $# -eq 1 -a $2=="--uninstall" ]; then
+    if _check_for_sudo; then
+        _uninstall
+    fi
+else
+    _show_usage
+fi
+    
